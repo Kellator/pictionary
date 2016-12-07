@@ -1,7 +1,9 @@
 //allows drawing to the canvas
 var pictionary = function() {
     var canvas, context;
-//tells context that new object will start being drawn    
+    var socket = io();
+
+//tells context that new object will start being drawn (makes the drawing utensil on the board)  
     var draw = function(position) {
         context.beginPath();
         context.arc(position.x, position.y, 6, 0, 2 * Math.PI);
@@ -16,10 +18,16 @@ var pictionary = function() {
         var offset = canvas.offset();
         var position = {x: event.pageX - offset.left,
                         y: event.pageY - offset.top};
+        //emit a draw event from here - should contain position as data
+        socket.emit('draw', position)
         draw(position);
+        socket.on('draw', function(position) {
+        draw(position);
+    })
     });
 };
 
 $(document).ready(function() {
     pictionary();
 });
+//call draw function when broadcast for draw event is received

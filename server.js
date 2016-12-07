@@ -9,4 +9,12 @@ app.use(express.static('public'));
 var server = http.Server(app);
 var io = socket_io(server);
 
+//listen for the draw event and broadcast to all other clients
+io.on('connection', function(socket) {
+    console.log('And we are on');
+    socket.on('draw', function(position) {
+        socket.broadcast.emit('draw', position);
+    });
+    });
+
 server.listen(process.env.PORT || 8080);
