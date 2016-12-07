@@ -13,7 +13,7 @@ var io = socket_io(server);
 io.on('connection', function(socket) {
     console.log('And we are on');
     socket.on('draw', function(position) {
-        socket.broadcast.emit('draw', position);
+        io.emit('draw', position);
     });
     });
 
