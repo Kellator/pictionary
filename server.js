@@ -16,6 +16,7 @@ io.on('connection', function(socket) {
     });
     socket.on('guess', function(guess) {
         io.emit('guess', guess);
+        console.log(guess);
     });
 });
 

@@ -12,9 +12,6 @@ var pictionary = function() {
     
     var guessBox;
     var guessDisplay = $('#guess_display');
-    var displayGuess = function(guess) {
-    guessDisplay.append('<div>' + guess + '</div>');
-    };
 
 //listens for the keypresses in the input    
 //needs to also EMIT a guess event to the server when a guess is made (should have the word the user guessed as data)
@@ -23,16 +20,13 @@ var pictionary = function() {
         if (event.keyCode != 13) {
             return;
         }
-        
-        console.log(guessBox.val());
+        // console.log(guessBox.val());
         var guess = guessBox.val();
-        console.log(guess + ' this is the guess before');
-        displayGuess(guess);
         socket.emit('guess', guess);
+        socket.on('guess', function(guess) {
+            guessDisplay.append('<div>' + guess + '</div>');
+        });
         guessBox.val('');
-        
-        console.log(guess + ' this is the guess after');
-
     };
     
     guessBox = $('#guess input');
