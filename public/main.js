@@ -1,8 +1,12 @@
 //allows drawing to the canvas
 var pictionary = function() {
+    
     var canvas, context;
     var socket = io();
     var drawing = false;
+    
+    var $nickNameInput = $('.nickName');
+    var nickName
 //tells context that new object will start being drawn (makes the drawing utensil on the board)  
     var draw = function(position) {
         context.beginPath();
