@@ -11,10 +11,12 @@ var io = socket_io(server);
 
 //listen for the draw event and broadcast to all other clients
 io.on('connection', function(socket) {
-    console.log('And we are on');
     socket.on('draw', function(position) {
         io.emit('draw', position);
     });
+    socket.on('guess', function(guess) {
+        io.emit('guess', guess);
     });
+});
 
 server.listen(process.env.PORT || 8080);
