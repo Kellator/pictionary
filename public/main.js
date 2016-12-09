@@ -23,9 +23,6 @@ var pictionary = function() {
         // console.log(guessBox.val());
         var guess = guessBox.val();
         socket.emit('guess', guess);
-        socket.on('guess', function(guess) {
-            guessDisplay.append('<div>' + guess + '</div>');
-        });
         guessBox.val('');
     };
     
@@ -53,6 +50,12 @@ var pictionary = function() {
             draw(position);
         });
         };
+
+    });
+    socket.on('guess', function(guess) {
+        var displayMessage = ('<div>' + guess + '</div>');
+        guessDisplay.append(displayMessage);
+        console.log('i am the display message ' +displayMessage);
     });
 };
 
