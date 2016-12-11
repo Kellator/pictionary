@@ -1,12 +1,12 @@
 //allows drawing to the canvas
 var pictionary = function() {
-    
+    var input = $('input');
     var canvas, context;
     var socket = io();
     var drawing = false;
-    
     var $nickNameInput = $('.nickName');
-    var nickName
+    var nickName;
+    var nameBox;
 //tells context that new object will start being drawn (makes the drawing utensil on the board)  
     var draw = function(position) {
         context.beginPath();
@@ -16,10 +16,39 @@ var pictionary = function() {
     
     var guessBox;
     var guessDisplay = $('#guess_display');
-
-//listens for the keypresses in the input    
-//needs to also EMIT a guess event to the server when a guess is made (should have the word the user guessed as data)
-//broadcast a the guess to all of the other clients
+    var words = [
+        'dragon', 'phoenix', 'chimera', 'banshee', 'black dog', 'kitsune', 'ogre', 'wyvern', 'giant', 'elf', 'fairy', 'gnome',
+        'beholder', 'soot sprite', 'kelpie', 'selkie', 'naga', 'mermaid', 'unicorn', 'gorgon', 'sphinx', 'centaur', 'cyclops', 'ghost', 'griffin', 
+        'minotaur', 'satyr', 'valkyrie', 'vampire', 'werewolf', 'zombie'];
+        
+    var currentWordIndex = 0;
+    var randomWord = 0;
+//function to choose current word using random number generation
+    var randomWordGenerator = function() {
+        currentWordIndex = Math.floor(Math.random() * words.length);
+        console.log(currentWordIndex);
+        console.log(words[currentWordIndex]);
+    }
+    randomWordGenerator();
+    
+//hides main game screen until user nick name is entered    
+    // $(function() {
+    //     $('#main').hide();
+    // });   
+//shows game page after user nick name entered, sets user's nickname to be used in chat/guessing
+    // var setNickName = function() {
+    //     console.log('made it to setNickName Function')
+    //     nickName = $nickNameInput.val().trim();
+    //     if (nickName) {
+    //         $('#welcome_page').hide();
+    //         $('#main').show();
+    //         $('#welcome_page').off('click');
+    //         socket.emit('addNickName', nickName);
+    //         console.log(nickName);
+    //     }
+    // };
+    // nickName.on('name', setNickName)
+//listens for the keypresses in the input, emits user guess event to the server 
     var onKeyDown = function(event) {
         if (event.keyCode != 13) {
             return;
@@ -29,9 +58,9 @@ var pictionary = function() {
         socket.emit('guess', guess);
         guessBox.val('');
     };
-    
     guessBox = $('#guess input');
     guessBox.on('keydown', onKeyDown);
+    
 //selects the canvas element and allows user to create a drawing context    
     canvas = $('canvas');
     context = canvas[0].getContext('2d');
@@ -50,20 +79,24 @@ var pictionary = function() {
                             y: event.pageY - offset.top};
             socket.emit('draw', position)
             draw(position);
-            socket.on('draw', function(position) {
-            draw(position);
-        });
         };
-
     });
+    socket.on('draw', function(position) {
+        draw(position);
+    });
+//broadcasts user's guess to all clients
     socket.on('guess', function(guess) {
         var displayMessage = ('<div>' + guess + '</div>');
         guessDisplay.append(displayMessage);
         console.log('i am the display message ' +displayMessage);
     });
+    socket.on('login', function(data) {
+        var msg = '<br>' + data.nickName + ' has connected.</small><br />  There are ' + data.playerCount + ' players currently connected.';
+        console.log('in login:', data);
+        guessDisplay.append(msg);
+    });
 };
 
-//listen for the guess event - when received update the contents of <div> guess_display to display last guess
 $(document).ready(function() {
     pictionary();
 });
