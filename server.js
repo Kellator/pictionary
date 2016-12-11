@@ -8,32 +8,34 @@ app.use(express.static('public'));
 
 var server = http.Server(app);
 var io = socket_io(server);
+
 var players = {};
 var playerCount = 0;
 
 //listen for the draw event and broadcast to all other clients
 io.on('connection', function(socket) {
-    console.log('player connected');
+    console.log('player connected', socket.id);
     var addedPlayer = false;
+    socket.on('addPlayer', function(user) {
+        console.log(user);
+        socket.nickName = player;
+        players[player] = player;
+        ++playerCount;
+        addedPlayer = true;
+        console.log(playerCount);
+        socket.broadcast.emit('login', {
+            user: player,
+            playerCount: playerCount
+        });
+    });    
     socket.on('draw', function(position) {
         io.emit('draw', position);
     });
-//adds player nick name and increases player count
-    // socket.on('addPlayer', function(player) {
-    //     socket.nickName = player;
-    //     players[player] = player;
-    //     console.log(player);
-    //     ++playerCount;
-    //     addedPlayer = true;
-    //     socket.broadcast.emit('login', {
-    //         player: player,
-    //         playerCount: playerCount
-    //     });
-    // });
+
 //shows user who is currently guessing
     socket.on('guessing', function() {
         socket.broadcast.emit('guessing', {
-            player: socket.nickName
+            user: socket.nickName
         });
     });
 
@@ -41,16 +43,22 @@ io.on('connection', function(socket) {
         io.emit('guess', guess);
         console.log(guess);
     });
+    socket.on*'typing', function() {
+        socket.broadcast.emit('typing', {
+            user: socket.nickName,
+        })
+    }
     socket.on('disconnect', function() {
-        console.log('player disconnected');
-        // if (addedPlayer) {
-        //     delete players[socket.nickName];
-        //     --playerCount;
-        // }
-        // socket.broadcast.emit('playerDisconnect', {
-        //     player: socket.nickName,
-        //     playerCount: playerCount
-        // });
+        console.log('player disconnected2');
+        if (addedPlayer) {
+            delete players[socket.nickName];
+            --playerCount;
+        }
+        socket.broadcast.emit('playerDisconnect', {
+            player: socket.nickName,
+            playerCount: playerCount
+        });
+        console.log('disconnect: ', socket.nickName);
     });
 });
 
