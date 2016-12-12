@@ -14,17 +14,21 @@ var playerCount = 0;
 
 //listen for the draw event and broadcast to all other clients
 io.on('connection', function(socket) {
-    console.log('player connected', socket.id);
+    console.log('player connected');
     var addedPlayer = false;
-    socket.on('addPlayer', function(user) {
-        console.log(user);
-        socket.nickName = player;
-        players[player] = player;
+    socket.on('message', function(message) {
+        io.emit('message', message);
+        console.log('socket.on 1 ' + message);
+    });
+    socket.on('addUserName', function(user) {
+        console.log('console.log addPlayer');
+        players[user] = user;
+        console.log(user + 'player here');
         ++playerCount;
         addedPlayer = true;
         console.log(playerCount);
         socket.broadcast.emit('login', {
-            user: player,
+            user: user,
             playerCount: playerCount
         });
     });    
@@ -33,21 +37,12 @@ io.on('connection', function(socket) {
     });
 
 //shows user who is currently guessing
-    socket.on('guessing', function() {
-        socket.broadcast.emit('guessing', {
-            user: socket.nickName
-        });
-    });
 
-    socket.on('guess', function(guess) {
-        io.emit('guess', guess);
-        console.log(guess);
-    });
-    socket.on*'typing', function() {
+    socket.on('typing', function() {
         socket.broadcast.emit('typing', {
-            user: socket.nickName,
-        })
-    }
+            user: socket.userName,
+    });
+    });
     socket.on('disconnect', function() {
         console.log('player disconnected2');
         if (addedPlayer) {
@@ -55,7 +50,7 @@ io.on('connection', function(socket) {
             --playerCount;
         }
         socket.broadcast.emit('playerDisconnect', {
-            player: socket.nickName,
+            user: socket.nickName,
             playerCount: playerCount
         });
         console.log('disconnect: ', socket.nickName);
