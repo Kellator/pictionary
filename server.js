@@ -9,24 +9,27 @@ app.use(express.static('public'));
 var server = http.Server(app);
 var io = socket_io(server);
 
-var players = [];
+//var players = [];
 var playerCount = 0;
+var playerList = [];
 
 
 //listen for the draw event and broadcast to all other clients
 io.on('connection', function(socket) {
     console.log('player connected');
     var addedPlayer = false;
-    console.log(players);
     //broadcasts message (guess)
     socket.on('message', function(message) {
         io.emit('message', message);
     });
     //add new player name, increases player count, and broadcasts informatino to client.
     socket.on('addUserName', function(user) {
-        players[user] = user;
+        //players[user] = user;
         ++playerCount;
         addedPlayer = true;
+        playerList.push(user);
+        socket.userName =user;
+        //console.log(playerList);
 
         io.emit('login', {
             user: user,
@@ -34,8 +37,12 @@ io.on('connection', function(socket) {
         });
     });
     //broadcasts who is drawing to players
-    socket.on('pen claimed', function(user) {
-        socket.broadcast.emit('pen claimed', user);
+    socket.on('pen claimed', function() {
+        console.log('pen claimed');
+        var isDrawer = true;
+        io.emit('pen claimed', {
+            user: socket.userName,
+    });
     });
     //broadcasts drawing to clients
     socket.on('draw', function(position) {
@@ -50,17 +57,25 @@ io.on('connection', function(socket) {
     });
     });
     socket.on('disconnect', function() {
-        if (addedPlayer) {
-            console.log(playerCount);
+        // if (addedPlayer) {
             --playerCount;
-            console.log(playerCount);
-        }
-        io.emit('playerDisconnect', {
+            console.log('player list:  ' + playerList);
+            var i = playerList.indexOf(socket.userName);
+            playerList.splice(i, 1);
+            console.log('var i  : ' + i);
+            // delete playerList[socket.userName];
+            console.log(playerList + ' playerList');
+            // playerList.remove(user); 
+            // var playerToRemove = playerList.indexOf(user);
+            // playerList.splice(playerToRemove, 1);
+            // console.log(playerCount);
+            // console.log(playerToRemove);
+        //}
+        socket.broadcast.emit('playerDisconnect', {
             user: socket.userName,
             playerCount: playerCount
         });
         console.log('disconnect: ', socket.userName);
-        console.log("disconnect players list: " + players );
     });
 });
 

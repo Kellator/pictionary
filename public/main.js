@@ -116,12 +116,15 @@ var pictionary = function() {
             }
         }
     });
+
     socket.on('draw', function(position) {
         draw(position);
     });
     //hides the button that allows player to be the drawer
-    socket.on('pen claimed', function() {
+    socket.on('pen claimed', function(data) {
         $('#claim').hide();
+        var msg = ('<br>' + data.user + ' has claimed the pen and is the drawer.');
+        playerDisplay.append(msg);
     });
     //when option is still available to be the drawer, shows the button that allows player to choose to be drawer and hides the guess section
     socket.on('pen open', function() {
@@ -144,6 +147,7 @@ var pictionary = function() {
     socket.on('playerDisconnect', function(data) {
         var msg = ('<br>' + data.user + ' has disconnected.</small><br />  There are now ' + data.playerCount + ' players currently connected.');
         playerDisplay.append(msg);
+        
         //socket.emit();
         });
 };
