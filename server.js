@@ -9,33 +9,36 @@ app.use(express.static('public'));
 var server = http.Server(app);
 var io = socket_io(server);
 
-var players = {};
+var players = [];
 var playerCount = 0;
+
 
 //listen for the draw event and broadcast to all other clients
 io.on('connection', function(socket) {
     console.log('player connected');
     var addedPlayer = false;
+    console.log(players);
+    //broadcasts message (guess)
     socket.on('message', function(message) {
         io.emit('message', message);
-        console.log('socket.on 1 ' + message);
     });
+    //add new player name, increases player count, and broadcasts informatino to client.
     socket.on('addUserName', function(user) {
-        console.log('console.log addPlayer');
         players[user] = user;
-        console.log(user + 'player here');
         ++playerCount;
         addedPlayer = true;
-        console.log(playerCount);
+
         socket.broadcast.emit('login', {
             user: user,
-            playerCount: playerCount
+            playerCount: playerCount,
         });
-    });    
+    });
+    
+    //broadcasts drawing to clients
     socket.on('draw', function(position) {
         io.emit('draw', position);
     });
-
+    //
 //shows user who is currently guessing
 
     socket.on('typing', function() {
@@ -43,17 +46,17 @@ io.on('connection', function(socket) {
             user: socket.userName,
     });
     });
-    socket.on('disconnect', function() {
-        console.log('player disconnected2');
+    socket.on('disconnect', function(user) {
         if (addedPlayer) {
-            delete players[socket.nickName];
+            delete players[user];
             --playerCount;
         }
+        console.log("disconnect players list: " + players );
         socket.broadcast.emit('playerDisconnect', {
-            user: socket.nickName,
+            user: user,
             playerCount: playerCount
         });
-        console.log('disconnect: ', socket.nickName);
+        console.log('disconnect: ', user);
     });
 });
 
