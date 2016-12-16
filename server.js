@@ -28,12 +28,15 @@ io.on('connection', function(socket) {
         ++playerCount;
         addedPlayer = true;
 
-        socket.broadcast.emit('login', {
+        io.emit('login', {
             user: user,
             playerCount: playerCount,
         });
     });
-    
+    //broadcasts who is drawing to players
+    socket.on('pen claimed', function(user) {
+        socket.broadcast.emit('pen claimed', user);
+    });
     //broadcasts drawing to clients
     socket.on('draw', function(position) {
         io.emit('draw', position);
@@ -46,17 +49,18 @@ io.on('connection', function(socket) {
             user: socket.userName,
     });
     });
-    socket.on('disconnect', function(user) {
+    socket.on('disconnect', function() {
         if (addedPlayer) {
-            delete players[user];
+            console.log(playerCount);
             --playerCount;
+            console.log(playerCount);
         }
-        console.log("disconnect players list: " + players );
-        socket.broadcast.emit('playerDisconnect', {
-            user: user,
+        io.emit('playerDisconnect', {
+            user: socket.userName,
             playerCount: playerCount
         });
-        console.log('disconnect: ', user);
+        console.log('disconnect: ', socket.userName);
+        console.log("disconnect players list: " + players );
     });
 });
 

@@ -56,7 +56,6 @@ var pictionary = function() {
 
     var addMessage = function(data) {
         console.log(data);
-        // guessDisplay.append('<div>' + data.user + ': ' + data.message + '</div>');
     };
     //shows game page after user nick name entered, sets user's nickname to be used in chat/guessing
     var setUserName = function() {
@@ -67,7 +66,6 @@ var pictionary = function() {
             $('#main').show();
             $('#welcome_page').off('click');
             socket.emit('addUserName', userName);
-            // console.log(nickName + ' hi');
         }
     };
     //displays word to draw to the player who is drawing
@@ -124,7 +122,7 @@ var pictionary = function() {
     //hides the button that allows player to be the drawer
     socket.on('pen claimed', function() {
         $('#claim').hide();
-    })
+    });
     //when option is still available to be the drawer, shows the button that allows player to choose to be drawer and hides the guess section
     socket.on('pen open', function() {
         $('#claim').show();
