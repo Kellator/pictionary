@@ -34,6 +34,10 @@ io.on('connection', function(socket) {
             playerCount: playerCount,
         });
     });
+    socket.on('canvas cleared', function() {
+        console.log('canvas has been cleared');
+        io.emit('canvas cleared', 'canvas cleared string');
+    });
     //broadcasts who is drawing to players
     socket.on('pen claimed', function() {
         console.log('pen claimed');

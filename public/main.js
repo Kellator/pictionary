@@ -81,18 +81,21 @@ var pictionary = function() {
             return;
         }
         if (userName) {
-            var message = guessBox.val();
+            var guess = guessBox.val();
             var user = userName;
-            addMessage({message: message, user: userName});
-            socket.emit('message', {message: message, user: userName});
+            addMessage({guess: guess, user: userName});
+            socket.emit('message', {guess: guess, user: userName});
             guessBox.val('');
-            console.log(message);
+            console.log('guess: ' + guess);
         } else {
             setUserName();
         }
     });
     //event buttons for restart game, wipe drawing board, 
-    $('#clear').on('click', clearCanvas);
+    // $('#clear').on('click', clearCanvas);
+    $('#clear').on('click', function(event) {
+        socket.emit('canvas cleared');
+    });
     $('#claim').on('click', function(event) {
         socket.emit('pen claimed');
     });
@@ -135,14 +138,12 @@ var pictionary = function() {
         $('#claim').show();
         $('#guess').hide();
     });
-    
+    socket.on('canvas cleared', clearCanvas);
     socket.on('drawer', displayWord);
     //broadcasts user's guess to all clients 
     socket.on('message', function(data) {
-        console.log(data + ' message');
-        var displayMessage = ('<div>' + data.user + ': ' + data.message + '</div>');
+        var displayMessage = ('<div>' + data.user + ': ' + data.guess + '</div>');
         guessDisplay.append(displayMessage);
-        console.log('i am the display message ' +displayMessage);
     });
     socket.on('login', function(data) {
         var msg = ('<br>' + data.user + ' is connected.</small><br />  There are ' + data.playerCount + ' players currently connected.');
