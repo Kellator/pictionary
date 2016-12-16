@@ -46,8 +46,8 @@ var pictionary = function() {
         console.log(words[currentWordIndex]);
         word = words[currentWordIndex];
     };
-    randomWordGenerator();
-    console.log(word);
+    //randomWordGenerator();
+    //console.log(word);
     
     //hides main game screen until user nick name is entered    
     $(function() {
@@ -71,6 +71,7 @@ var pictionary = function() {
     //displays word to draw to the player who is drawing
     var displayWord = function() {
         isDrawer = true;
+        randomWordGenerator();
         $('#word').text('You are the drawer!  Draw a ' + word + '.');
         $('#guess').hide;
     }
