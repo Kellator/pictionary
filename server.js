@@ -34,15 +34,16 @@ io.on('connection', function(socket) {
             playerCount: playerCount,
         });
     });
+    //transmits canvas clear command
     socket.on('canvas cleared', function() {
         console.log('canvas has been cleared');
-        io.emit('canvas cleared', 'canvas cleared string');
+        io.emit('canvas cleared');
     });
     //broadcasts who is drawing to players
     socket.on('pen claimed', function() {
         console.log('pen claimed');
         var isDrawer = true;
-        socket.emit('drawer', 'socket emit string');
+        socket.emit('drawer');
         io.emit('pen claimed', {
             user: socket.userName,
         });
@@ -57,6 +58,7 @@ io.on('connection', function(socket) {
             user: socket.userName,
         });
     });
+    //broadcast when user disconnects
     socket.on('disconnect', function() {
         console.log('player list:  ' + playerList);
         var i = playerList.indexOf(socket.userName);

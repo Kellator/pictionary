@@ -132,7 +132,7 @@ var pictionary = function() {
         $('#claim').hide();
         if (isDrawer == false) {
             $('#clear').hide();
-        };
+        }
         var msg = ('<br>' + data.user + ' has claimed the pen and is the drawer.');
         playerDisplay.append(msg);
     });
@@ -156,9 +156,7 @@ var pictionary = function() {
     socket.on('playerDisconnect', function(data) {
         var msg = ('<br>' + data.user + ' has disconnected.</small><br />  There are now ' + data.playerCount + ' players currently connected.');
         playerDisplay.append(msg);
-        
-        //socket.emit();
-        });
+    });
 };
 
 $(document).ready(function() {
