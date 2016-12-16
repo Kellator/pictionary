@@ -92,6 +92,9 @@ var pictionary = function() {
     });
     //event buttons for restart game, wipe drawing board, 
     $('#clear').on('click', clearCanvas);
+    $('#claim').on('click', function(event) {
+        socket.emit('pen claimed');
+    });
 
     guessBox = $('#guess input');
     //selects the canvas element and allows user to create a drawing context    
@@ -131,7 +134,8 @@ var pictionary = function() {
         $('#claim').show();
         $('#guess').hide();
     });
-    socket.on('drawer', displayWord());
+    
+    socket.on('drawer', displayWord);
     //broadcasts user's guess to all clients 
     socket.on('message', function(data) {
         console.log(data + ' message');

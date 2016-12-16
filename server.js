@@ -38,6 +38,7 @@ io.on('connection', function(socket) {
     socket.on('pen claimed', function() {
         console.log('pen claimed');
         var isDrawer = true;
+        socket.emit('drawer', 'socket emit string');
         io.emit('pen claimed', {
             user: socket.userName,
         });
