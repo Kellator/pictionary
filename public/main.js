@@ -130,6 +130,9 @@ var pictionary = function() {
     //hides the button that allows player to be the drawer
     socket.on('pen claimed', function(data) {
         $('#claim').hide();
+        if (isDrawer == false) {
+            $('#clear').hide();
+        };
         var msg = ('<br>' + data.user + ' has claimed the pen and is the drawer.');
         playerDisplay.append(msg);
     });
