@@ -24,12 +24,10 @@ io.on('connection', function(socket) {
     });
     //add new player name, increases player count, and broadcasts informatino to client.
     socket.on('addUserName', function(user) {
-        //players[user] = user;
         ++playerCount;
         addedPlayer = true;
         playerList.push(user);
-        socket.userName =user;
-        //console.log(playerList);
+        socket.userName = user;
 
         io.emit('login', {
             user: user,
@@ -42,40 +40,29 @@ io.on('connection', function(socket) {
         var isDrawer = true;
         io.emit('pen claimed', {
             user: socket.userName,
-    });
+        });
     });
     //broadcasts drawing to clients
     socket.on('draw', function(position) {
         io.emit('draw', position);
     });
-    //
-//shows user who is currently guessing
-
+    //shows user who is currently guessing
     socket.on('typing', function() {
         socket.broadcast.emit('typing', {
             user: socket.userName,
-    });
+        });
     });
     socket.on('disconnect', function() {
-        // if (addedPlayer) {
-            --playerCount;
-            console.log('player list:  ' + playerList);
-            var i = playerList.indexOf(socket.userName);
+        console.log('player list:  ' + playerList);
+        var i = playerList.indexOf(socket.userName);
+        if (i != -1) {
             playerList.splice(i, 1);
-            console.log('var i  : ' + i);
-            // delete playerList[socket.userName];
-            console.log(playerList + ' playerList');
-            // playerList.remove(user); 
-            // var playerToRemove = playerList.indexOf(user);
-            // playerList.splice(playerToRemove, 1);
-            // console.log(playerCount);
-            // console.log(playerToRemove);
-        //}
-        socket.broadcast.emit('playerDisconnect', {
-            user: socket.userName,
-            playerCount: playerCount
-        });
-        console.log('disconnect: ', socket.userName);
+            --playerCount;
+            socket.broadcast.emit('playerDisconnect', {
+                user: socket.userName,
+                playerCount: playerCount
+            });
+        }
     });
 });
 

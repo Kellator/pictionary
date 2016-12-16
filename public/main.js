@@ -91,7 +91,7 @@ var pictionary = function() {
         }
     });
     //event buttons for restart game, wipe drawing board, 
-    $('#clear').on('click', clearCanvas());
+    $('#clear').on('click', clearCanvas);
 
     guessBox = $('#guess input');
     //selects the canvas element and allows user to create a drawing context    
