@@ -22,6 +22,7 @@ var pictionary = function() {
     var currentWordIndex = 0;
     var wordDisplay = $('.picture');
     
+    var drawing = false;
     var isDrawer = false;
 
     var word;
@@ -107,13 +108,14 @@ var pictionary = function() {
         drawing = false;
     });
     canvas.on('mousemove', function(event) {
-        // if (drawing === true) {
+        if (drawing === true) {
             var offset = canvas.offset();
             var position = {x: event.pageX - offset.left,
                             y: event.pageY - offset.top};
             if (isDrawer) {
                 socket.emit('draw', position);
                 draw(position);
+            }
         }
     });
     socket.on('draw', function(position) {
