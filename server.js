@@ -21,6 +21,8 @@ io.on('connection', function(socket) {
     //broadcasts message (guess)
     socket.on('message', function(message) {
         io.emit('message', message);
+        io.emit('guess', message.guess);
+        console.log('guess: ' + message.guess);
     });
     //add new player name, increases player count, and broadcasts informatino to client.
     socket.on('addUserName', function(user) {
@@ -48,6 +50,10 @@ io.on('connection', function(socket) {
             user: socket.userName,
         });
     });
+    socket.on('word', function(word) {
+        console.log('word : ' + word);
+        io.emit('word', word);
+    });
     //broadcasts drawing to clients
     socket.on('draw', function(position) {
         io.emit('draw', position);
@@ -58,6 +64,9 @@ io.on('connection', function(socket) {
             user: socket.userName,
         });
     });
+    // socket.on('winner', function() {
+    //     io.emit('player wins')
+    // })
     //broadcast when user disconnects
     socket.on('disconnect', function() {
         console.log('player list:  ' + playerList);
@@ -71,6 +80,7 @@ io.on('connection', function(socket) {
             });
         }
     });
+    
 });
 
 server.listen(process.env.PORT || 8080);

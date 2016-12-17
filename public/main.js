@@ -17,7 +17,7 @@ var pictionary = function() {
     var words = [
         'dragon', 'phoenix', 'chimera', 'banshee', 'black dog', 'kitsune', 'ogre', 'wyvern', 'giant', 'elf', 'fairy', 'gnome',
         'beholder', 'soot sprite', 'kelpie', 'selkie', 'naga', 'mermaid', 'unicorn', 'gorgon', 'sphinx', 'centaur', 'cyclops', 'ghost', 'griffin', 
-        'minotaur', 'satyr', 'valkyrie', 'vampire', 'werewolf', 'zombie'];
+        'minotaur', 'satyr', 'valkyrie', 'vampire', 'werewolf', 'zombie', 'angel'];
         
     var currentWordIndex = 0;
     var wordDisplay = $('.picture');
@@ -45,10 +45,9 @@ var pictionary = function() {
         console.log(currentWordIndex);
         console.log(words[currentWordIndex]);
         word = words[currentWordIndex];
+        socket.emit('word', word);
     };
-    //randomWordGenerator();
-    //console.log(word);
-    
+
     //hides main game screen until user nick name is entered    
     $(function() {
         $('#main').hide();
@@ -57,6 +56,19 @@ var pictionary = function() {
     var addMessage = function(data) {
         console.log(data);
     };
+    var checkGuess = function(data) {
+        console.log('word in checkGuess: ' + word);
+        console.log('guess in checkGuess: ' + data.guess);
+        // var winner = alert(data.user + ' has guessed correctly!  The word was ' + word);
+        // if (word == data.guess) {
+        //   socket.emit('winner', winner); 
+        // }
+    };
+    // var playerWins = function(data) {
+    //     alert(data.user + ' has guessed correctly!  The word was ' + word);
+    // }
+    // socket.on('player wins', playerWins);
+    socket.on('message', checkGuess);
     //shows game page after user nick name entered, sets user's nickname to be used in chat/guessing
     var setUserName = function() {
         userName = $userNameInput.val().trim();
@@ -74,7 +86,8 @@ var pictionary = function() {
         randomWordGenerator();
         $('#word').text('You are the drawer!  Draw a ' + word + '.');
         $('#guess').hide;
-    }
+    };
+    //compares guess to word to determine winner
 
     input.on('keydown', function(event) {
         if (event.keyCode != 13) {
@@ -143,6 +156,7 @@ var pictionary = function() {
     });
     socket.on('canvas cleared', clearCanvas);
     socket.on('drawer', displayWord);
+
     //broadcasts user's guess to all clients 
     socket.on('message', function(data) {
         var displayMessage = ('<div>' + data.user + ': ' + data.guess + '</div>');
