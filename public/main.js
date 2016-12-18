@@ -9,7 +9,7 @@ var pictionary = function() {
     var userName;
     var input = $('input');
     
-    var guessBox;
+    var guessBox = $('#guess input');
     var guessDisplay = $('#guess_display');
     
     var playerDisplay = $('#player_display');
@@ -26,6 +26,7 @@ var pictionary = function() {
     var isDrawer = false;
 
     var word;
+    
     canvas[0].width = canvas[0].offsetWidth;
 	canvas[0].height = canvas[0].offsetHeight;
 
@@ -54,18 +55,16 @@ var pictionary = function() {
     });  
 
     var addMessage = function(data) {
+        // socket.emit('typing');
         console.log(data);
     };
     //compares guess in message to word from randomizer.  alerts if there is a winner.
-    var checkGuess = function(word) {
+    var checkGuess = function(data) {
         console.log('word in checkGuess: ' + word);
-        console.log('guess in checkGuess: ' + socket.guess);
+        console.log('guess in checkGuess: ' + data.guess);
         //if (word == guess) { alert(user + ' has guess correctly.  The answer is ' + guess + '.');
     };
-    socket.on('word', function(word) {
-        console.log(word);
-    });
-    //new game wipes canvas clean and offers chose pen button
+    //new game wipes canvas clean, removes guesses,  and offers chose pen button
     var newGame = function() {
         clearCanvas();
         $('#guess').show();
@@ -74,7 +73,6 @@ var pictionary = function() {
         guessDisplay.remove();
         alert('A new game has started.  Click ok and then claim the pen to draw');
     };
-    socket.on('message', checkGuess);
     //shows game page after user nick name entered, sets user's nickname to be used in chat/guessing
     var setUserName = function() {
         userName = $userNameInput.val().trim();
@@ -93,8 +91,8 @@ var pictionary = function() {
         $('#word').text('You are the drawer!  Draw a ' + word + '.');
         $('#guess').hide();
     };
-    //compares guess to word to determine winner
-
+    
+    //inputs player name and allows player to enter guesses
     input.on('keydown', function(event) {
         if (event.keyCode != 13) {
             return;
@@ -105,13 +103,11 @@ var pictionary = function() {
             addMessage({guess: guess, user: userName});
             socket.emit('message', {guess: guess, user: userName});
             guessBox.val('');
-            console.log('guess: ' + guess);
         } else {
             setUserName();
         }
     });
     //event buttons for restart game, wipe drawing board, 
-    // $('#clear').on('click', clearCanvas);
     $('#clear').on('click', function(event) {
         socket.emit('canvas cleared');
     });
@@ -121,7 +117,6 @@ var pictionary = function() {
     $('#restart').on('click', function(event) {
         socket.emit('new game');
     });
-    guessBox = $('#guess input');
     //selects the canvas element and allows user to create a drawing context    
     canvas = $('canvas');
     context = canvas[0].getContext('2d');
@@ -162,6 +157,12 @@ var pictionary = function() {
         $('#claim').show();
         $('#guess').hide();
     });
+    socket.on('word', function(word) {
+        word = word;
+        console.log(word);
+    });
+
+    socket.on('message', checkGuess);
     socket.on('canvas cleared', clearCanvas);
     socket.on('drawer', displayWord);
     socket.on('new game', newGame);
@@ -171,11 +172,18 @@ var pictionary = function() {
         var displayMessage = ('<div>' + data.user + ': ' + data.guess + '</div>');
         guessDisplay.append(displayMessage);
     });
+    //broadcasts when new user logs in and shows user name and how many current players
     socket.on('login', function(data) {
         var msg = ('<br>' + data.user + ' is connected.</small><br />  There are ' + data.playerCount + ' players currently connected.');
         console.log('in login:', data);
         playerDisplay.append(msg);
     });
+    //broadcasts who is typing
+    // socket.on('typing', function(data) {
+    //     var msg = ('<br>' + data.user + 'is typing.</br>');
+    //     guessDisplay.append(msg);
+    // });
+    //broadcasts when a player disconnects, who disconnected and how many players remain in the game.
     socket.on('playerDisconnect', function(data) {
         var msg = ('<br>' + data.user + ' has disconnected.</small><br />  There are now ' + data.playerCount + ' players currently connected.');
         playerDisplay.append(msg);

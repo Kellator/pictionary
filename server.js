@@ -56,18 +56,18 @@ io.on('connection', function(socket) {
     });
     socket.on('word', function(word) {
         console.log('word : ' + word);
-        io.emit('answer', word)
+        io.emit('word', word);
     });
     //broadcasts drawing to clients
     socket.on('draw', function(position) {
         io.emit('draw', position);
     });
-    //shows user who is currently guessing
-    socket.on('typing', function() {
-        socket.broadcast.emit('typing', {
-            user: socket.userName,
-        });
-    });
+    //shows user who is currently typing
+    // socket.on('typing', function() {
+    //     socket.broadcast.emit('typing', {
+    //         user: socket.userName,
+    //     });
+    // });
     //broadcast when user disconnects
     socket.on('disconnect', function() {
         var i = playerList.indexOf(socket.userName);
