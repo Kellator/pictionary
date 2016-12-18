@@ -56,18 +56,24 @@ var pictionary = function() {
     var addMessage = function(data) {
         console.log(data);
     };
-    var checkGuess = function(data) {
+    //compares guess in message to word from randomizer.  alerts if there is a winner.
+    var checkGuess = function(word) {
         console.log('word in checkGuess: ' + word);
-        console.log('guess in checkGuess: ' + data.guess);
-        // var winner = alert(data.user + ' has guessed correctly!  The word was ' + word);
-        // if (word == data.guess) {
-        //   socket.emit('winner', winner); 
-        // }
+        console.log('guess in checkGuess: ' + socket.guess);
+        //if (word == guess) { alert(user + ' has guess correctly.  The answer is ' + guess + '.');
     };
-    // var playerWins = function(data) {
-    //     alert(data.user + ' has guessed correctly!  The word was ' + word);
-    // }
-    // socket.on('player wins', playerWins);
+    socket.on('word', function(word) {
+        console.log(word);
+    });
+    //new game wipes canvas clean and offers chose pen button
+    var newGame = function() {
+        clearCanvas();
+        $('#guess').show();
+        $('#claim').show();
+        $('#clear').show();
+        guessDisplay.remove();
+        alert('A new game has started.  Click ok and then claim the pen to draw');
+    };
     socket.on('message', checkGuess);
     //shows game page after user nick name entered, sets user's nickname to be used in chat/guessing
     var setUserName = function() {
@@ -85,7 +91,7 @@ var pictionary = function() {
         isDrawer = true;
         randomWordGenerator();
         $('#word').text('You are the drawer!  Draw a ' + word + '.');
-        $('#guess').hide;
+        $('#guess').hide();
     };
     //compares guess to word to determine winner
 
@@ -112,7 +118,9 @@ var pictionary = function() {
     $('#claim').on('click', function(event) {
         socket.emit('pen claimed');
     });
-
+    $('#restart').on('click', function(event) {
+        socket.emit('new game');
+    });
     guessBox = $('#guess input');
     //selects the canvas element and allows user to create a drawing context    
     canvas = $('canvas');
@@ -156,6 +164,7 @@ var pictionary = function() {
     });
     socket.on('canvas cleared', clearCanvas);
     socket.on('drawer', displayWord);
+    socket.on('new game', newGame);
 
     //broadcasts user's guess to all clients 
     socket.on('message', function(data) {

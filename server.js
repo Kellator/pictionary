@@ -41,6 +41,10 @@ io.on('connection', function(socket) {
         console.log('canvas has been cleared');
         io.emit('canvas cleared');
     });
+    socket.on('new game', function() {
+        console.log('a new game has been started');
+        io.emit('new game');
+    });
     //broadcasts who is drawing to players
     socket.on('pen claimed', function() {
         console.log('pen claimed');
@@ -52,7 +56,7 @@ io.on('connection', function(socket) {
     });
     socket.on('word', function(word) {
         console.log('word : ' + word);
-        io.emit('word', word);
+        io.emit('answer', word)
     });
     //broadcasts drawing to clients
     socket.on('draw', function(position) {
@@ -64,12 +68,8 @@ io.on('connection', function(socket) {
             user: socket.userName,
         });
     });
-    // socket.on('winner', function() {
-    //     io.emit('player wins')
-    // })
     //broadcast when user disconnects
     socket.on('disconnect', function() {
-        console.log('player list:  ' + playerList);
         var i = playerList.indexOf(socket.userName);
         if (i != -1) {
             playerList.splice(i, 1);
