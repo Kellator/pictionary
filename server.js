@@ -12,7 +12,8 @@ var io = socket_io(server);
 //var players = [];
 var playerCount = 0;
 var playerList = [];
-
+var word;
+var guess;
 
 //listen for the draw event and broadcast to all other clients
 io.on('connection', function(socket) {
@@ -21,8 +22,16 @@ io.on('connection', function(socket) {
     //broadcasts message (guess)
     socket.on('message', function(message) {
         io.emit('message', message);
-        io.emit('guess', message.guess);
-        console.log('guess: ' + message.guess);
+        guess = message.guess;
+        console.log('word: ' + word + ', guess: ' + guess);
+        if (word == guess) {
+            io.emit('player wins');
+            console.log('made it to winner');
+        }
+    });
+    socket.on('word', function(picture) {
+        word = picture
+        console.log('word:: ' + picture);
     });
     //add new player name, increases player count, and broadcasts informatino to client.
     socket.on('addUserName', function(user) {
@@ -54,10 +63,7 @@ io.on('connection', function(socket) {
             user: socket.userName,
         });
     });
-    socket.on('word', function(word) {
-        console.log('word : ' + word);
-        io.emit('word', word);
-    });
+
     //broadcasts drawing to clients
     socket.on('draw', function(position) {
         io.emit('draw', position);

@@ -43,8 +43,6 @@ var pictionary = function() {
     //function to choose current word using random number generation
     var randomWordGenerator = function() {
         currentWordIndex = Math.floor(Math.random() * words.length);
-        console.log(currentWordIndex);
-        console.log(words[currentWordIndex]);
         word = words[currentWordIndex];
         socket.emit('word', word);
     };
@@ -56,14 +54,13 @@ var pictionary = function() {
 
     var addMessage = function(data) {
         // socket.emit('typing');
-        console.log(data);
     };
     //compares guess in message to word from randomizer.  alerts if there is a winner.
-    var checkGuess = function(data) {
-        console.log('word in checkGuess: ' + word);
-        console.log('guess in checkGuess: ' + data.guess);
-        //if (word == guess) { alert(user + ' has guess correctly.  The answer is ' + guess + '.');
-    };
+    // var checkGuess = function(data) {
+    //     console.log('word in checkGuess: ' + word);
+    //     console.log('guess in checkGuess: ' + data.guess);
+    //     //if (word == guess) { alert(user + ' has guess correctly.  The answer is ' + guess + '.');
+    // };
     //new game wipes canvas clean, removes guesses,  and offers chose pen button
     var newGame = function() {
         clearCanvas();
@@ -76,7 +73,6 @@ var pictionary = function() {
     //shows game page after user nick name entered, sets user's nickname to be used in chat/guessing
     var setUserName = function() {
         userName = $userNameInput.val().trim();
-        console.log('user is ' + userName);
         if (userName) {
             $('#welcome_page').hide();
             $('#main').show();
@@ -91,7 +87,6 @@ var pictionary = function() {
         $('#word').text('You are the drawer!  Draw a ' + word + '.');
         $('#guess').hide();
     };
-    
     //inputs player name and allows player to enter guesses
     input.on('keydown', function(event) {
         if (event.keyCode != 13) {
@@ -162,11 +157,17 @@ var pictionary = function() {
         console.log(word);
     });
 
-    socket.on('message', checkGuess);
+    // socket.on('message', checkGuess);
     socket.on('canvas cleared', clearCanvas);
     socket.on('drawer', displayWord);
     socket.on('new game', newGame);
 
+    //broagcasts when player wins and allows for new game
+    socket.on('player wins', function(data) {
+        var displayMessage = ('<div>' + data.user + ' has guess correctly!  The answer was ' + data.guess + '.</div>');
+        // var displayMessage = ('there is a winner');
+        guessDisplay.append(displayMessage);    
+    });
     //broadcasts user's guess to all clients 
     socket.on('message', function(data) {
         var displayMessage = ('<div>' + data.user + ': ' + data.guess + '</div>');
@@ -175,7 +176,6 @@ var pictionary = function() {
     //broadcasts when new user logs in and shows user name and how many current players
     socket.on('login', function(data) {
         var msg = ('<br>' + data.user + ' is connected.</small><br />  There are ' + data.playerCount + ' players currently connected.');
-        console.log('in login:', data);
         playerDisplay.append(msg);
     });
     //broadcasts who is typing
